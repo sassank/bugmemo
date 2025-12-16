@@ -28,11 +28,14 @@ Idéal pour ne plus jamais oublier comment résoudre un problème rencontré pr�
 
 1. Cloner le dépôt :
 
-bash
+```bash
 git clone https://github.com/ton-username/bugmemo.git
 cd bugmemo
-Installer les dépendances :
+```
 
+2. Installer les dépendances :
+
+```
 bash
 Copier le code
 npm install / yarn install
@@ -41,11 +44,16 @@ Créer le fichier .env.local avec tes variables Supabase :
 env
 Copier le code
 NEXT_PUBLIC_SUPABASE_URL=ton_url_supabase
-NEXT_PUBLIC_SUPABASE_ANON_KEY=ta_cle_anon
-Lancer le serveur de développement :
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+```
 
+3. Lancer le serveur de développement :
+
+```
 bash
 npm run dev / yarn dev
+```
+
 http://localhost:3000 pour voir l’application.
 
 ## Déploiement

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { getSupabaseClient } from '../../lib/supabase'
 import { useRouter } from 'next/navigation'
 
@@ -10,6 +10,27 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [checkingUser, setCheckingUser] = useState(true) // nouvel état
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const supabase = getSupabaseClient()
+      if (!supabase) return // quitte si supabase est null
+
+      const { data: { user }, error } = await supabase.auth.getUser()
+      if (error) {
+        console.error(error)
+        return
+      }
+
+      if (user) {
+        router.replace('/dashboard') // redirige si connecté
+      } else {
+        setCheckingUser(false)
+      }
+    }
+    checkUser()
+  }, [router])
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -29,15 +50,17 @@ export default function RegisterPage() {
     }
   }
 
+  if (checkingUser) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-400">
+        Vérification de l’état de connexion...
+      </div>
+    )
+  }
+
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-gray-900 text-white">
-      {/* Animated background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-600 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-600 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-indigo-600 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
-      </div>
-
+      {/* Ton formulaire ici */}
       <form
         onSubmit={handleRegister}
         className="relative z-10 bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-700 p-8 w-80 flex flex-col gap-4"
@@ -71,18 +94,6 @@ export default function RegisterPage() {
           Déjà un compte ? <a href="/login" className="text-blue-400 hover:underline">Se connecter</a>
         </p>
       </form>
-
-      <style jsx>{`
-        @keyframes blob {
-          0% { transform: translate(0px, 0px) scale(1); }
-          33% { transform: translate(30px, -50px) scale(1.1); }
-          66% { transform: translate(-20px, 20px) scale(0.9); }
-          100% { transform: translate(0px, 0px) scale(1); }
-        }
-        .animate-blob { animation: blob 7s infinite; }
-        .animation-delay-2000 { animation-delay: 2s; }
-        .animation-delay-4000 { animation-delay: 4s; }
-      `}</style>
     </div>
   )
 }

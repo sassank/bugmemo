@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { getSupabaseClient } from '../../lib/supabase'
 import { useRouter } from 'next/navigation'
 
@@ -10,6 +10,31 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [checkingUser, setCheckingUser] = useState(true) // pour afficher loader si on check l'utilisateur
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const supabase = getSupabaseClient()
+      if (!supabase) {
+        setCheckingUser(false)
+        return
+      }
+
+      const { data: { user }, error } = await supabase.auth.getUser()
+      if (error) {
+        console.error(error)
+        setCheckingUser(false)
+        return
+      }
+
+      if (user) {
+        router.replace('/dashboard') // redirige si connecté
+      } else {
+        setCheckingUser(false)
+      }
+    }
+    checkUser()
+  }, [router])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -17,13 +42,25 @@ export default function LoginPage() {
     setError(null)
 
     const supabase = getSupabaseClient()
-    if (!supabase) return
+    if (!supabase) {
+      setLoading(false)
+      setError('Impossible de se connecter au serveur')
+      return
+    }
 
     const { error: loginError } = await supabase.auth.signInWithPassword({ email, password })
 
     setLoading(false)
     if (loginError) setError(loginError.message)
     else router.push('/dashboard')
+  }
+
+  if (checkingUser) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-400">
+        Vérification de la session...
+      </div>
+    )
   }
 
   return (

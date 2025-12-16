@@ -1,10 +1,47 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { getSupabaseClient } from '../lib/supabase'
 
 export default function Home() {
+  const router = useRouter()
+  const [checkingUser, setCheckingUser] = useState(true)
   const [isHovered, setIsHovered] = useState<string | null>(null)
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const supabase = getSupabaseClient()
+      if (!supabase) {
+        setCheckingUser(false)
+        return
+      }
+
+      const { data: { user }, error } = await supabase.auth.getUser()
+      if (error) {
+        console.error(error)
+        setCheckingUser(false)
+        return
+      }
+
+      if (user) {
+        router.replace('/dashboard')
+      } else {
+        setCheckingUser(false)
+      }
+    }
+
+    checkUser()
+  }, [router])
+
+  if (checkingUser) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-400">
+        Vérification de la session...
+      </div>
+    )
+  }
 
   const features = [
     {
@@ -37,8 +74,8 @@ export default function Home() {
         <h1 className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-indigo-500 mb-6">
           BugMemo
         </h1>
-        <p className="text-lg text-gray-300 text-center max-w-xl mb-8">
-          Ne perdez plus jamais la solution à un bug. Documentez vos bugs, sauvegardez vos solutions et retrouvez-les instantanément.
+        <p className="text-lg text-gray-300 text-center max-w-xl mt-8 mb-10">
+          Conserver et retrouver facilement les bugs rencontrés
         </p>
 
         {/* Buttons */}
@@ -64,7 +101,10 @@ export default function Home() {
         {/* Features */}
         <div className="grid sm:grid-cols-3 gap-6 mt-12 w-full max-w-5xl">
           {features.map((feature, index) => (
-            <div key={index} className="bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl flex flex-col items-center text-center hover:bg-gray-700 transition-all">
+            <div
+              key={index}
+              className="bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl flex flex-col items-center text-center hover:bg-gray-700 transition-all"
+            >
               <div className="text-4xl mb-4">{feature.icon}</div>
               <h3 className="font-semibold text-lg mb-2">{feature.title}</h3>
               <p className="text-gray-300 text-sm">{feature.description}</p>

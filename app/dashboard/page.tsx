@@ -109,8 +109,8 @@ export default function DashboardPage() {
       <div className="bg-gray-800/90 backdrop-blur-sm shadow-sm border-b border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold">📋 Bug Tracker</h1>
-            <p className="text-gray-400 mt-1">Gérez et documentez vos bugs efficacement</p>
+            <h1 className="text-3xl font-bold">Bug Memo</h1>
+            <p className="text-gray-100 mt-1">Conserver et retrouver facilement les bugs rencontrés</p>
           </div>
           <Link
             href="/bugs/create"
@@ -130,7 +130,7 @@ export default function DashboardPage() {
               <p className="text-sm text-gray-400 font-medium">Total des bugs</p>
               <p className="text-3xl font-bold mt-1 text-white">{bugs.length}</p>
             </div>
-            <div className="bg-blue-500 rounded-full p-3">
+            <div className="bg-blue-00 rounded-full p-3">
               <span className="text-2xl">🐛</span>
             </div>
           </div>

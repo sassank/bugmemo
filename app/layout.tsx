@@ -14,7 +14,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Bug Memo",
-  description: "Conservez et retrouvez facilement vos bugs, logs et solutions pour ne jamais les oublier."
+  description:
+    "Conservez et retrouvez facilement vos bugs, logs et solutions pour ne jamais les oublier.",
 };
 
 export default function RootLayout({
@@ -24,9 +25,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <head>
+        {/* Devicon CSS */}
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
+        />
+      </head>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
       </body>
     </html>

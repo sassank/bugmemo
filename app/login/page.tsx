@@ -57,8 +57,7 @@ export default function LoginPage() {
 
   if (checkingUser) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-gray-400">
-        Vérification de la session...
+      <div className="min-h-screen flex items-center justify-center bg-gray-900 text-gray-300">
       </div>
     )
   }

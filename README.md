@@ -39,10 +39,11 @@ cd bugmemo
 bash
 Copier le code
 npm install / yarn install
+```
+
 Créer le fichier .env.local avec tes variables Supabase :
 
-env
-Copier le code
+```
 NEXT_PUBLIC_SUPABASE_URL=ton_url_supabase
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 ```

@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BugMemo
 
-## Getting Started
+BugMemo est une **SaaS pour les développeurs** qui permet de **conserver et retrouver facilement les bugs rencontrés**, leurs logs et leurs solutions.  
+Idéal pour ne plus jamais oublier comment résoudre un problème rencontré précédemment.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🌟 Fonctionnalités
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Authentification des utilisateurs (login / register)  
+- Dashboard personnalisé pour chaque utilisateur  
+- Création, lecture, modification et suppression (CRUD) des bugs  
+- Recherche et filtrage par titre ou tags  
+- Interface simple et responsive avec Tailwind CSS  
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠 Technologies utilisées
 
-## Learn More
+- Next.js(App Router + TypeScript)  
+- Tailwind CSS
+- Supabase (authentification et la base PostgreSQL)  
+- Déploiement avec Vercel
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🚀 Lancer le projet en local
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Cloner le dépôt :
 
-## Deploy on Vercel
+bash
+git clone https://github.com/ton-username/bugmemo.git
+cd bugmemo
+Installer les dépendances :
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+bash
+Copier le code
+npm install / yarn install
+Créer le fichier .env.local avec tes variables Supabase :
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+env
+Copier le code
+NEXT_PUBLIC_SUPABASE_URL=ton_url_supabase
+NEXT_PUBLIC_SUPABASE_ANON_KEY=ta_cle_anon
+Lancer le serveur de développement :
+
+bash
+npm run dev / yarn dev
+http://localhost:3000 pour voir l’application.
+
+## Déploiement
+BugMemo est déployé sur Vercel :
+https://bugmemo.vercel.app
+
+## Contribuer
+Les contributions sont les bienvenues :
+
+- Signaler des bugs
+- Proposer des améliorations
+- Participer au développement de nouvelles fonctionnalités

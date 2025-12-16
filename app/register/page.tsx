@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { supabase } from '../../lib/supabase'
+import { getSupabaseClient } from '../../lib/supabase'
 import { useRouter } from 'next/navigation'
 
 export default function RegisterPage() {
@@ -16,10 +16,13 @@ export default function RegisterPage() {
     setLoading(true)
     setError(null)
 
-    const { data, error } = await supabase.auth.signUp({ email, password })
+    const supabase = getSupabaseClient()
+    if (!supabase) return
+
+    const { data, error: registerError } = await supabase.auth.signUp({ email, password })
 
     setLoading(false)
-    if (error) setError(error.message)
+    if (registerError) setError(registerError.message)
     else {
       alert('Compte créé ! Vérifiez votre email pour confirmer.')
       router.push('/login')
@@ -30,10 +33,28 @@ export default function RegisterPage() {
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-black">
       <form onSubmit={handleRegister} className="flex flex-col gap-4 p-8 bg-white dark:bg-zinc-900 rounded shadow-md w-80">
         <h2 className="text-2xl font-bold text-center text-black dark:text-white">Créer un compte</h2>
-        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required className="p-2 border rounded" />
-        <input type="password" placeholder="Mot de passe" value={password} onChange={(e) => setPassword(e.target.value)} required className="p-2 border rounded" />
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className="p-2 border rounded"
+        />
+        <input
+          type="password"
+          placeholder="Mot de passe"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          className="p-2 border rounded"
+        />
         {error && <p className="text-red-500">{error}</p>}
-        <button type="submit" disabled={loading} className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700">
+        <button
+          type="submit"
+          disabled={loading}
+          className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+        >
           {loading ? 'Chargement...' : 'S’inscrire'}
         </button>
       </form>

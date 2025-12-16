@@ -10,43 +10,47 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  const [checkingUser, setCheckingUser] = useState(true) // pour afficher loader si on check l'utilisateur
+  const [checkingUser, setCheckingUser] = useState(true)
+
+  const supabase = getSupabaseClient()!
 
   useEffect(() => {
     const checkUser = async () => {
-      const supabase = getSupabaseClient()
-      if (!supabase) {
-        setCheckingUser(false)
-        return
-      }
-
-      const { data: { user }, error } = await supabase.auth.getUser()
-      if (error) {
-        console.error(error)
-        setCheckingUser(false)
-        return
-      }
-
-      if (user) {
-        router.replace('/dashboard') // redirige si connecté
-      } else {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession()
+        if (error) {
+          console.error(error)
+          setCheckingUser(false)
+          return
+        }
+        if (session?.user) {
+          router.replace('/dashboard')
+        } else {
+          setCheckingUser(false)
+        }
+      } catch (err) {
+        console.error('Erreur lors de la vérification de la session:', err)
         setCheckingUser(false)
       }
     }
     checkUser()
-  }, [router])
+
+    // Écoute les changements de session
+    const { data: listener } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_IN') {
+        router.replace('/dashboard')
+      }
+    })
+
+    return () => {
+      listener.subscription.unsubscribe()
+    }
+  }, [router, supabase])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
-
-    const supabase = getSupabaseClient()
-    if (!supabase) {
-      setLoading(false)
-      setError('Impossible de se connecter au serveur')
-      return
-    }
 
     const { error: loginError } = await supabase.auth.signInWithPassword({ email, password })
 
@@ -58,6 +62,7 @@ export default function LoginPage() {
   if (checkingUser) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900 text-gray-300">
+        Chargement...
       </div>
     )
   }

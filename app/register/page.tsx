@@ -10,26 +10,42 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  const [checkingUser, setCheckingUser] = useState(true) // nouvel état
+  const [checkingUser, setCheckingUser] = useState(true)
+
+  const supabase = getSupabaseClient()!
 
   useEffect(() => {
     const checkUser = async () => {
-      const supabase = getSupabaseClient()
-      if (!supabase) return // quitte si supabase est null
-
-      const { data: { user }, error } = await supabase.auth.getUser()
-      if (error) {
-        console.error(error)
-        return
-      }
-
-      if (user) {
-        router.replace('/dashboard') // redirige si connecté
-      } else {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession()
+        if (error) {
+          console.error(error)
+          setCheckingUser(false)
+          return
+        }
+        if (session?.user) {
+          router.replace('/dashboard')
+        } else {
+          setCheckingUser(false)
+        }
+      } catch (err) {
+        console.error('Erreur lors de la vérification de la session:', err)
         setCheckingUser(false)
       }
     }
+
     checkUser()
+
+    // Écoute des changements de session (connexion ailleurs)
+    const { data: listener } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_IN') {
+        router.replace('/dashboard')
+      }
+    })
+
+    return () => {
+      listener.subscription.unsubscribe()
+    }
   }, [router])
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -37,29 +53,31 @@ export default function RegisterPage() {
     setLoading(true)
     setError(null)
 
-    const supabase = getSupabaseClient()
-    if (!supabase) return
-
-    const { error: registerError } = await supabase.auth.signUp({ email, password })
-
-    setLoading(false)
-    if (registerError) setError(registerError.message)
-    else {
-      alert('Compte créé ! Vérifiez votre email pour confirmer.')
-      router.push('/login')
+    try {
+      const { error: registerError } = await supabase.auth.signUp({ email, password })
+      setLoading(false)
+      if (registerError) setError(registerError.message)
+      else {
+        alert('Compte créé ! Vérifiez votre email pour confirmer.')
+        router.push('/login')
+      }
+    } catch (err) {
+      console.error(err)
+      setError('Erreur lors de l’inscription')
+      setLoading(false)
     }
   }
 
   if (checkingUser) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900 text-gray-300">
+        Chargement...
       </div>
     )
   }
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-gray-900 text-white">
-      {/* Ton formulaire ici */}
       <form
         onSubmit={handleRegister}
         className="relative z-10 bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-700 p-8 w-80 flex flex-col gap-4"

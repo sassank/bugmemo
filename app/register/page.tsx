@@ -19,7 +19,7 @@ export default function RegisterPage() {
     const supabase = getSupabaseClient()
     if (!supabase) return
 
-    const { data, error: registerError } = await supabase.auth.signUp({ email, password })
+    const { error: registerError } = await supabase.auth.signUp({ email, password })
 
     setLoading(false)
     if (registerError) setError(registerError.message)
@@ -30,16 +30,26 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-black">
-      <form onSubmit={handleRegister} className="flex flex-col gap-4 p-8 bg-white dark:bg-zinc-900 rounded shadow-md w-80">
-        <h2 className="text-2xl font-bold text-center text-black dark:text-white">Créer un compte</h2>
+    <div className="relative min-h-screen flex items-center justify-center bg-gray-900 text-white">
+      {/* Animated background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-600 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-600 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-indigo-600 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+      </div>
+
+      <form
+        onSubmit={handleRegister}
+        className="relative z-10 bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-700 p-8 w-80 flex flex-col gap-4"
+      >
+        <h2 className="text-2xl font-bold text-center mb-4">Créer un compte</h2>
         <input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="p-2 border rounded"
+          className="p-2 rounded border border-gray-600 bg-gray-700 text-white placeholder-gray-400"
         />
         <input
           type="password"
@@ -47,17 +57,32 @@ export default function RegisterPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="p-2 border rounded"
+          className="p-2 rounded border border-gray-600 bg-gray-700 text-white placeholder-gray-400"
         />
-        {error && <p className="text-red-500">{error}</p>}
+        {error && <p className="text-red-500 text-sm">{error}</p>}
         <button
           type="submit"
           disabled={loading}
-          className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+          className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition-all"
         >
           {loading ? 'Chargement...' : 'S’inscrire'}
         </button>
+        <p className="text-sm text-gray-400 text-center mt-2">
+          Déjà un compte ? <a href="/login" className="text-blue-400 hover:underline">Se connecter</a>
+        </p>
       </form>
+
+      <style jsx>{`
+        @keyframes blob {
+          0% { transform: translate(0px, 0px) scale(1); }
+          33% { transform: translate(30px, -50px) scale(1.1); }
+          66% { transform: translate(-20px, 20px) scale(0.9); }
+          100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob { animation: blob 7s infinite; }
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-4000 { animation-delay: 4s; }
+      `}</style>
     </div>
   )
 }

@@ -52,12 +52,12 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen bg-gray-900 text-white overflow-hidden">
-      <main className="relative z-10 flex flex-col items-center justify-center min-h-screen p-6">
+      <main className="relative z-10 flex flex-col items-center justify-center min-h-screen p-4">
         <h1 className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-indigo-500 mb-6">
           BugMemo
         </h1>
 
-        <p className="text-lg text-gray-300 text-center max-w-xl mb-10">
+        <p className="text-lg text-gray-300 text-center max-w-xl mt-6 mb-10">
           Conserver et retrouver facilement les bugs rencontrés
         </p>
 

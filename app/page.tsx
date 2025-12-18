@@ -106,7 +106,7 @@ export default function Home() {
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 mb-12">
           <Link
-            href="/register"
+            href="/auth/register"
             className="group relative px-8 py-4 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 font-semibold shadow-lg hover:shadow-blue-500/30 transition-all duration-300 transform hover:scale-105"
           >
             <span className="relative z-10">Commencer</span>
@@ -114,7 +114,7 @@ export default function Home() {
           </Link>
 
           <Link
-            href="/login"
+            href="/auth/login"
             className="px-8 py-4 rounded-xl border-2 border-gray-600 hover:border-blue-500 text-gray-300 hover:text-white hover:bg-gray-800/50 font-semibold transition-all duration-300"
           >
             Se connecter

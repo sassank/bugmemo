@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { getSupabaseClient } from '../../lib/supabase'
+import { getSupabaseClient } from '../../../lib/supabase'
 import { useRouter } from 'next/navigation'
 
 export default function ForgotPasswordPage() {
@@ -76,7 +76,7 @@ export default function ForgotPasswordPage() {
             </div>
 
             <button
-              onClick={() => router.push('/login')}
+              onClick={() => router.push('/auth/login')}
               className="px-8 py-3 rounded-lg bg-gray-700 hover:bg-gray-600 font-semibold transition-colors"
             >
               Retour à la connexion
@@ -110,7 +110,7 @@ export default function ForgotPasswordPage() {
         )}
 
         <div className="text-center">
-          <a href="/login" className="text-sm text-blue-400 hover:underline">
+          <a href="/auth/login" className="text-sm text-blue-400 hover:underline">
             ← Retour à la connexion
           </a>
         </div>

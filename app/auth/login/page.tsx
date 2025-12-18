@@ -1,10 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { getSupabaseClient } from '../../lib/supabase'
+import { getSupabaseClient } from '../../../lib/supabase'
 import { useRouter } from 'next/navigation'
 
-export default function RegisterPage() {
+export default function LoginPage() {
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -49,22 +49,26 @@ export default function RegisterPage() {
     }
   }, [router])
 
-  const handleRegister = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
 
     try {
-      const { error: registerError } = await supabase.auth.signUp({ email, password })
-      setLoading(false)
-      if (registerError) setError(registerError.message)
-      else {
-        alert('Compte créé ! Vérifiez votre email pour confirmer.')
-        router.push('/login')
+      const { error: loginError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+      
+      if (loginError) {
+        setError(loginError.message)
+        setLoading(false)
+      } else {
+        // La redirection sera gérée par onAuthStateChange
       }
     } catch (err) {
       console.error(err)
-      setError("Erreur lors de l'inscription")
+      setError('Erreur lors de la connexion')
       setLoading(false)
     }
   }
@@ -108,7 +112,7 @@ export default function RegisterPage() {
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-gray-900 text-white">
       <div className="relative z-10 bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-700 p-8 w-96 flex flex-col gap-4">
-        <h2 className="text-2xl font-bold text-center mb-2">Créer un compte</h2>
+        <h2 className="text-2xl font-bold text-center mb-2">Connexion</h2>
         
         {/* Bouton Google */}
         <button
@@ -146,7 +150,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Formulaire classique */}
-        <form onSubmit={handleRegister} className="flex flex-col gap-4">
+        <form onSubmit={handleLogin} className="flex flex-col gap-4">
           <input
             type="email"
             placeholder="Email"
@@ -173,13 +177,22 @@ export default function RegisterPage() {
             disabled={loading || loadingGoogle}
             className="px-8 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Chargement...' : "S'inscrire par email"}
+            {loading ? 'Connexion...' : 'Se connecter'}
           </button>
         </form>
 
-        <p className="text-sm text-gray-400 text-center mt-2">
-          Déjà un compte ? <a href="/login" className="text-blue-400 hover:underline">Se connecter</a>
-        </p>
+        {/* Liens supplémentaires */}
+        <div className="flex flex-col gap-2 text-sm text-center">
+          <a href="/auth/forgot-password" className="text-blue-400 hover:underline">
+            Mot de passe oublié ?
+          </a>
+          <p className="text-gray-400">
+            Pas encore de compte ?{' '}
+            <a href="/auth/register" className="text-blue-400 hover:underline">
+              S'inscrire
+            </a>
+          </p>
+        </div>
       </div>
     </div>
   )

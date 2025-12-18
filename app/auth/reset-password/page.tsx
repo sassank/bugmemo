@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { getSupabaseClient } from '../../lib/supabase'
+import { getSupabaseClient } from '../../../lib/supabase'
 import { useRouter } from 'next/navigation'
 
 export default function ResetPasswordPage() {
@@ -123,7 +123,7 @@ export default function ResetPasswordPage() {
             Demander un nouveau lien
           </button>
 
-          <a href="/login" className="text-sm text-center text-blue-400 hover:underline">
+          <a href="auth/login" className="text-sm text-center text-blue-400 hover:underline">
             Retour à la connexion
           </a>
         </div>

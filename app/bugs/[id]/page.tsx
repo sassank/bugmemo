@@ -6,8 +6,8 @@ import { useEffect, useState } from 'react'
 import { getSupabaseClient } from '../../../lib/supabase'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Listbox } from '@headlessui/react'
 import { SiReact, SiNodedotjs, SiPython, SiNextdotjs, SiJavascript, SiTypescript, SiPhp, SiCplusplus, SiRuby, SiGo, SiRust, SiHtml5, SiCss3, SiTailwindcss, SiSass, SiAngular, SiDjango, SiFlask, SiSpring, SiLaravel, SiExpress, SiPostgresql, SiMysql, SiMongodb, SiFlutter, SiVuedotjs, SiJbl } from 'react-icons/si'
+import { BiArrowBack, BiCopy, BiCheck } from 'react-icons/bi'
 
 type Status = 'En cours' | 'Résolu'
 type Bug = {
@@ -22,13 +22,13 @@ type Bug = {
 
 const techIcons: Record<string, React.ReactNode> = {
   React: <SiReact className="text-blue-400 w-5 h-5" />,
-  'Next.js': <SiNextdotjs className="text-black w-5 h-5" />,
+  'Next.js': <SiNextdotjs className="text-white w-5 h-5" />,
   'Node.js': <SiNodedotjs className="text-green-400 w-5 h-5" />,
   Python: <SiPython className="text-yellow-400 w-5 h-5" />,
   JavaScript: <SiJavascript className="text-yellow-300 w-5 h-5" />,
   TypeScript: <SiTypescript className="text-blue-500 w-5 h-5" />,
   PHP: <SiPhp className="text-purple-500 w-5 h-5" />,
-  Java: <SiJbl className="text-purple-500 w-5 h-5" />,
+  Java: <SiJbl className="text-orange-500 w-5 h-5" />,
   'C++': <SiCplusplus className="text-blue-600 w-5 h-5" />,
   Ruby: <SiRuby className="text-red-500 w-5 h-5" />,
   Go: <SiGo className="text-blue-500 w-5 h-5" />,
@@ -41,7 +41,7 @@ const techIcons: Record<string, React.ReactNode> = {
   Angular: <SiAngular className="text-red-600 w-5 h-5" />,
   Vue: <SiVuedotjs className="text-green-600 w-5 h-5" />,
   Django: <SiDjango className="text-green-800 w-5 h-5" />,
-  Flask: <SiFlask className="text-black w-5 h-5" />,
+  Flask: <SiFlask className="text-white w-5 h-5" />,
   Spring: <SiSpring className="text-green-500 w-5 h-5" />,
   Laravel: <SiLaravel className="text-red-600 w-5 h-5" />,
   Express: <SiExpress className="text-gray-200 w-5 h-5" />,
@@ -51,21 +51,14 @@ const techIcons: Record<string, React.ReactNode> = {
   Other: <span className="w-5 h-5 flex items-center justify-center">🛠️</span>,
 }
 
-const statuses: Status[] = ['En cours', 'Résolu']
-
 export default function BugDetailPage() {
   const router = useRouter()
   const params = useParams()
   const [bug, setBug] = useState<Bug | null>(null)
   const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
-  const [title, setTitle] = useState('')
-  const [errorLog, setErrorLog] = useState('')
-  const [solution, setSolution] = useState('')
-  const [tech, setTech] = useState('React')
-  const [status, setStatus] = useState<Status>('En cours')
+  const [copiedError, setCopiedError] = useState(false)
+  const [copiedSolution, setCopiedSolution] = useState(false)
 
   useEffect(() => {
     fetchBug()
@@ -97,12 +90,6 @@ export default function BugDetailPage() {
 
       if (fetchError) throw fetchError
       setBug(data as Bug)
-      // Initialiser les champs éditables
-      setTitle((data as Bug).title)
-      setErrorLog((data as Bug).error_log)
-      setSolution((data as Bug).solution || '')
-      setTech((data as Bug).tech)
-      setStatus((data as Bug).status)
     } catch (err) {
       console.error('Erreur lors du chargement:', err)
       setError(err instanceof Error ? err.message : 'Erreur de chargement')
@@ -123,129 +110,181 @@ export default function BugDetailPage() {
     }).format(date)
   }
 
-  const handleSave = async () => {
-    if (!bug) return
-    setSaving(true)
-    setError(null)
-    const supabase = getSupabaseClient()
-    if (!supabase) return
-
+  const copyToClipboard = async (text: string, type: 'error' | 'solution') => {
     try {
-      const { error: updateError } = await supabase
-        .from('bugs')
-        .update({
-          title,
-          error_log: errorLog,
-          solution,
-          tech,
-          status,
-        })
-        .eq('id', bug.id)
-
-      if (updateError) throw updateError
-      router.refresh()
+      await navigator.clipboard.writeText(text)
+      if (type === 'error') {
+        setCopiedError(true)
+        setTimeout(() => setCopiedError(false), 2000)
+      } else {
+        setCopiedSolution(true)
+        setTimeout(() => setCopiedSolution(false), 2000)
+      }
     } catch (err) {
-      console.error(err)
-      setError(err instanceof Error ? err.message : 'Erreur lors de la sauvegarde')
-    } finally {
-      setSaving(false)
+      console.error('Erreur lors de la copie:', err)
     }
   }
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center text-gray-400">Chargement...</div>
-  if (error || !bug) return (
-    <div className="min-h-screen bg-gray-900 p-8 text-center text-red-400">
-      {error || 'Bug introuvable'}
-      <Link href="/dashboard" className="block mt-4 text-blue-500">Retour</Link>
-    </div>
-  )
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4 mx-auto"></div>
+          <p className="text-gray-400">Chargement du bug...</p>
+        </div>
+      </div>
+    )
+  }
 
-  const sortedTechs = Object.keys(techIcons).sort()
+  if (error || !bug) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-8">
+        <div className="bg-gradient-to-br from-gray-800 to-gray-800/50 rounded-xl p-8 text-center border border-gray-700/50 shadow-xl max-w-md">
+          <div className="text-6xl mb-4">❌</div>
+          <h2 className="text-xl font-semibold text-red-400 mb-4">{error || 'Bug introuvable'}</h2>
+          <Link 
+            href="/dashboard" 
+            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg transition"
+          >
+            <BiArrowBack />
+            Retour au dashboard
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  const isResolved = bug.status?.toLowerCase() === 'résolu'
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white py-8 px-4">
       <div className="max-w-4xl mx-auto space-y-6">
+        
+        {/* En-tête avec bouton retour */}
+        <div className="flex items-center justify-between">
+          <Link 
+            href="/dashboard" 
+            className="flex items-center gap-2 text-gray-400 hover:text-white transition group"
+          >
+            <BiArrowBack className="group-hover:-translate-x-1 transition-transform" />
+            <span>Retour au dashboard</span>
+          </Link>
+        </div>
 
-        <Link href="/dashboard" className="text-gray-400 hover:text-white mb-4 inline-flex items-center gap-2">← Retour au dashboard</Link>
+        {/* Carte principale */}
+        <div className="bg-gradient-to-br from-gray-800 to-gray-800/50 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-700/50 overflow-hidden">
+          
+          {/* En-tête du bug */}
+          <div className="bg-gradient-to-r from-gray-800 to-gray-700/50 p-6 sm:p-8 border-b border-gray-700/50">
+            <div className="flex items-start gap-4 mb-4">
+              <h1 className="text-2xl sm:text-3xl font-bold text-white flex-1">{bug.title}</h1>
+            </div>
+            
+            {/* Métadonnées */}
+            <div className="flex flex-wrap gap-3 sm:gap-4 text-sm">
+              <span className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${isResolved ? 'bg-green-500/20 text-green-400' : 'bg-orange-500/20 text-orange-400'}`}>
+                <span className={`w-2 h-2 rounded-full ${isResolved ? 'bg-green-400' : 'bg-orange-400'}`}></span>
+                {bug.status}
+              </span>
+              
+              <span className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/20 text-blue-400">
+                {techIcons[bug.tech] || techIcons.Other}
+                {bug.tech}
+              </span>
+              
+              <span className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-700/50 text-gray-400">
+                📅 {formatDate(bug.created_at)}
+              </span>
+            </div>
+          </div>
 
-        <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-700 overflow-hidden p-6 space-y-6">
-
-          {/* Titre */}
-          <input
-            value={title}
-            onChange={e => setTitle(e.target.value)}
-            className="w-full text-2xl font-bold bg-gray-700 p-2 rounded-lg text-white"
-          />
-
-          {/* Meta */}
-          <div className="flex flex-wrap gap-4 text-sm text-gray-400">
-            <span className="flex items-center gap-1">🐛 ID: {bug.id}</span>
-            <span className="flex items-center gap-1">📅 {formatDate(bug.created_at)}</span>
-
-            {/* Tech editable */}
-            <Listbox value={tech} onChange={setTech}>
-              <div className="relative">
-                <Listbox.Button className="flex items-center gap-1 bg-gray-700 px-2 py-1 rounded-lg">
-                  💻 {tech} {techIcons[tech]}
-                </Listbox.Button>
-                <Listbox.Options className="absolute mt-1 w-full bg-gray-700 rounded-lg max-h-60 overflow-auto z-10">
-                  {sortedTechs.map(t => (
-                    <Listbox.Option key={t} value={t} className="cursor-pointer px-4 py-2 flex justify-between items-center hover:bg-gray-600">
-                      {t} {techIcons[t]}
-                    </Listbox.Option>
-                  ))}
-                </Listbox.Options>
+          {/* Contenu */}
+          <div className="p-6 sm:p-8 space-y-6">
+            
+            {/* Section Erreur */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold flex items-center gap-2">
+                  <span className="text-2xl">⚠️</span>
+                  Code d'erreur
+                </h2>
+                <button
+                  onClick={() => copyToClipboard(bug.error_log, 'error')}
+                  className="flex items-center gap-2 px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition text-sm"
+                  title="Copier l'erreur"
+                >
+                  {copiedError ? (
+                    <>
+                      <BiCheck className="w-4 h-4" />
+                      <span className="hidden sm:inline">Copié !</span>
+                    </>
+                  ) : (
+                    <>
+                      <BiCopy className="w-4 h-4" />
+                      <span className="hidden sm:inline">Copier</span>
+                    </>
+                  )}
+                </button>
               </div>
-            </Listbox>
+              
+              <div className="bg-gradient-to-br from-red-500/5 to-red-500/10 border-l-4 border-red-500 rounded-lg p-4 sm:p-6">
+                <pre className="text-red-100 text-sm sm:text-base font-mono whitespace-pre-wrap break-words overflow-x-auto">
+                  {bug.error_log}
+                </pre>
+              </div>
+            </div>
 
-            {/* Status editable */}
-            <select
-              value={status}
-              onChange={e => setStatus(e.target.value as Status)}
-              className="bg-gray-700 text-white px-2 py-1 rounded-lg"
-            >
-              {statuses.map(s => <option key={s} value={s}>{s}</option>)}
-            </select>
-          </div>
+            {/* Section Solution */}
+            {bug.solution ? (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-lg font-semibold flex items-center gap-2">
+                    <span className="text-2xl">✅</span>
+                    Solution trouvée
+                  </h2>
+                  <button
+                    onClick={() => copyToClipboard(bug.solution!, 'solution')}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-green-500/10 hover:bg-green-500/20 text-green-400 rounded-lg transition text-sm"
+                    title="Copier la solution"
+                  >
+                    {copiedSolution ? (
+                      <>
+                        <BiCheck className="w-4 h-4" />
+                        <span className="hidden sm:inline">Copié !</span>
+                      </>
+                    ) : (
+                      <>
+                        <BiCopy className="w-4 h-4" />
+                        <span className="hidden sm:inline">Copier</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+                
+                <div className="bg-gradient-to-br from-green-500/5 to-green-500/10 border-l-4 border-green-500 rounded-lg p-4 sm:p-6">
+                  <pre className="text-green-100 text-sm sm:text-base whitespace-pre-wrap break-words">
+                    {bug.solution}
+                  </pre>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <h2 className="text-lg font-semibold flex items-center gap-2 text-gray-400">
+                  <span className="text-2xl">🔍</span>
+                  Solution
+                </h2>
+                <div className="bg-gray-700/30 border border-dashed border-gray-600 rounded-lg p-6 text-center">
+                  <p className="text-gray-400 italic">Aucune solution enregistrée pour le moment</p>
+                </div>
+              </div>
+            )}
 
-          {/* Logs */}
-          <div>
-            <label className="block mb-1 font-semibold">Logs / Description</label>
-            <textarea
-              value={errorLog}
-              onChange={e => setErrorLog(e.target.value)}
-              rows={6}
-              className="w-full bg-gray-700 p-2 rounded-lg text-white font-mono"
-            />
-          </div>
-
-          {/* Solution */}
-          <div>
-            <label className="block mb-1 font-semibold">Solution</label>
-            <textarea
-              value={solution}
-              onChange={e => setSolution(e.target.value)}
-              rows={4}
-              className="w-full bg-gray-700 p-2 rounded-lg text-white"
-            />
-          </div>
-
-          {/* Buttons */}
-          {error && <p className="text-red-400">{error}</p>}
-          <div className="flex gap-4">
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="flex-1 bg-blue-600 py-2 rounded-lg hover:bg-blue-700 transition"
-            >
-              {saving ? 'Sauvegarde...' : 'Enregistrer'}
-            </button>
-            <Link
-              href="/dashboard"
-              className="flex-1 text-center border border-gray-600 rounded-lg py-2 text-gray-200 hover:bg-gray-700 transition"
-            >
-              Annuler
-            </Link>
+            {/* ID du bug (pour référence) */}
+            <div className="pt-4 border-t border-gray-700/50">
+              <p className="text-xs text-gray-500">
+                <span className="font-mono">ID: {bug.id}</span>
+              </p>
+            </div>
           </div>
         </div>
       </div>

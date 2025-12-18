@@ -1,6 +1,6 @@
 # BugMemo
 
-BugMemo est une **SaaS pour les développeurs** qui permet de **conserver et retrouver facilement les bugs rencontrés**, leurs logs et leurs solutions.  
+BugMemo est un outil pour les développeurs qui permet de conserver et retrouver facilement les bugs rencontrés, leurs logs et leurs solutions.  
 Idéal pour ne plus jamais oublier comment résoudre un problème rencontré précédemment.
 
 ---
@@ -29,7 +29,7 @@ Idéal pour ne plus jamais oublier comment résoudre un problème rencontré pr�
 1. Cloner le dépôt :
 
 ```bash
-git clone https://github.com/ton-username/bugmemo.git
+git https://github.com/sassank/bugmemo.git
 cd bugmemo
 ```
 

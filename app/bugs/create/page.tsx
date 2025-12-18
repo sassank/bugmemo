@@ -155,7 +155,7 @@ export default function CreateBugPage() {
 
           {/* Logs */}
           <div className="bg-gray-800 rounded-xl p-4">
-            <label className="block mb-1">Logs / Description de l'erreur</label>
+            <label className="block mb-1">Code d'erreur</label>
             <textarea
               value={errorLog}
               onChange={(e) => setErrorLog(e.target.value)}
@@ -191,7 +191,7 @@ export default function CreateBugPage() {
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 bg-blue-600 py-3 rounded-lg font-medium hover:bg-blue-700 transition"
+              className="flex-1 bg-green-600 py-3 rounded-lg font-medium hover:bg-green-700 transition"
             >
               {loading ? 'Création...' : 'Créer le bug'}
             </button>

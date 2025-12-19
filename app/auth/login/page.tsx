@@ -74,32 +74,29 @@ export default function LoginPage() {
   }
 
   const handleGoogleSignIn = async () => {
-    setLoadingGoogle(true)
-    setError(null)
+  setLoadingGoogle(true)
+  setError(null)
 
-    try {
-      const { error: googleError } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          },
+  try {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
         },
-      })
+      },
+    })
 
-      if (googleError) {
-        setError(googleError.message)
-        setLoadingGoogle(false)
-      }
-      // Pas besoin de setLoading(false) ici car on sera redirigé
-    } catch (err) {
-      console.error('Erreur Google:', err)
-      setError('Erreur lors de la connexion avec Google')
-      setLoadingGoogle(false)
-    }
+    if (error) setError(error.message)
+  } catch (err) {
+    console.error(err)
+    setError('Erreur lors de la connexion avec Google')
+  } finally {
+    setLoadingGoogle(false)
   }
+}
 
   if (checkingUser) {
     return (
